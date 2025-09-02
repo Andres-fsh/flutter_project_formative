@@ -39,13 +39,19 @@ const updateRole = async (req, res) => {
         res.status(400).send({status: "FAILED", data: updatedRole});
 }
 
-const deleteUser = async (req, res) => {
-    let id = req.params.userId;
-    const deletedRole = await roleService.deleteRole
+const deleteRole = async (req, res) => {
+    let id = req.params.roleId;
+    const deletedRole = await roleService.deleteRole(id);
+    if (deletedRole)
+        res.status(200).send({status: "OK", data: deletedRole});
+    else
+        res.status(400).send({status: "FAILED", data: deletedRole});
+
 }
 module.exports = {
     getAllRoles,
     getRole,
     createRole, 
-    updateRole
+    updateRole,
+    deleteRole
 };
