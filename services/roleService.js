@@ -2,7 +2,7 @@ const db = require ('../models');
 
 const getAllRoles = async () =>{
     try {
-        let roles = await db.Role.findAll();
+        let roles = await db.Roles.findAll();
         return roles;
 
     }catch (error) {
@@ -12,30 +12,30 @@ const getAllRoles = async () =>{
 
 const getRole = async(id) => {
     try {
-        let roles = await db.Role.findAll();
+        let roles = await db.Roles.findByPk(id);
         return roles;
     } catch (error) {
         return error.message || "Failed to get roles";
     }
 };
 
-const createRol = async (name,email,password) => {
+const createRole = async (name,description) => {
     try {
-        let newRole = await db.Rol.create({
+        let newRole = await db.Roles.create({
             name,
-            email,
-            password,
+            description
         });
+        return newRole;
     } catch (error) {
         return error.message || "Rol could not be created";
     }
 };
-const updateRol = async (id,name,email,password) => {
+
+const updateRole = async (id,name,description) => {
     try {
-        let updatedRol = await db.Rol.update({
+        let updatedRol = await db.Roles.update({
             name,
-            email,
-            password
+            description
         }, {
             where : {
                 id,
@@ -47,9 +47,9 @@ const updateRol = async (id,name,email,password) => {
     }
 };
 
-const deleteRol = async (id) => {
+const deleteRole = async (id) => {
     try {
-        const deletedRole = await db.Rol.destroy({
+        const deletedRole = await db.Roles.destroy({
             where: {
                 id,
             }
@@ -62,7 +62,7 @@ const deleteRol = async (id) => {
 module.exports = {
     getAllRoles,
     getRole,
-    createRol,
-    updateRol,
-    deleteRol,
+    createRole,
+    updateRole,
+    deleteRole,
 };

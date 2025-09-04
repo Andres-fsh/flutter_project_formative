@@ -24,5 +24,8 @@
     "sequelize": "^6.37.7",
     "sequelize-cli": "^6.6.3"
   },
-  "description": ""
+  "description": "",
+  "devDependencies": {
+    "dotenv": "^17.2.2"
+  }
 }

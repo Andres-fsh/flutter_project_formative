@@ -21,7 +21,7 @@ const getRole = async (req, res) => {
 
 const createRole = async (req, res) =>{
     const {body} = req;
-    const createdRole = await roleService.createdRole(body.name, body.description);
+    const createdRole = await roleService.createRole(body.name, body.description);
 if(createdRole)
     res.status(201).send({ status: "OK", data: createdRole});
 else 
@@ -30,7 +30,7 @@ else
 
 
 const updateRole = async (req, res) => {
-    let id = req.params.rolId;
+    let id = req.params.roleId; // Corregido: de rolId a roleId para que coincida con routes
     let {name, description} = req.body;
     const updatedRole =await roleService.updateRole(id,name,description);
     if(updatedRole)
