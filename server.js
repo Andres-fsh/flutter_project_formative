@@ -21,6 +21,8 @@ app.use('/api/v1/roles', require('./api/v1/routes/roles.routes'));
 app.use('/api/v1/categoriesNews', require('./api/v1/routes/categoriesNews.routes'));
 app.use('/api/v1/users', require('./api/v1/routes/users.routes'));
 app.use('/api/v1/consultancies', require('./api/v1/routes/consultancies.routes'));
+app.use('/api/v1/lineSennova', require('./api/v1/routes/lineSennova.routes'));
+app.use('/api/v1/typeForms', require('./api/v1/routes/typeForm.routes'));
 
 
 app.listen(app.get('port'), () => {

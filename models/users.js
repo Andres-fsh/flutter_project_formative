@@ -8,13 +8,19 @@ module.exports = (sequelize, DataTypes) => {
         as: 'role' 
       });
       
-      // Un usuario puede tener muchas consultorías
       Users.hasMany(models.Consultancies, {
         foreignKey: 'fkIdUsers',
         as: 'consultancies'
       });
+      
+     
+      Users.hasMany(models.LinesSennova, {
+        foreignKey: 'fkIdUsers',
+        as: 'linesSennova'
+      });
     }
   }
+  
   Users.init({
     userName: DataTypes.STRING,
     password: DataTypes.STRING,

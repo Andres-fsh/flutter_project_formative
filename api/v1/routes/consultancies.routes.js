@@ -1,3 +1,4 @@
+const db = require('../../../models');
 const { Router } = require('express');
 const consultancyController = require('../../../controllers/consultancyController');
 

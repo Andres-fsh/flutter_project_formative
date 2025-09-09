@@ -2,12 +2,12 @@ const db = require('../models');
 
 const getAllUsers = async () => {
     try {
-        // Usa "include" para traer los datos del rol asociado
+    
         let users = await db.Users.findAll({
             include: [{
                 model: db.Roles,
-                as: 'role', // Usa el alias definido en el modelo Users
-                attributes: ['id', 'name'] // Selecciona solo los campos que necesitas
+                as: 'role', 
+                attributes: ['id', 'name'] 
             }]
         });
         return users;
@@ -18,7 +18,7 @@ const getAllUsers = async () => {
 
 const getUser = async (id) => {
     try {
-        // También usa "include" para una sola búsqueda
+        
         let user = await db.Users.findByPk(id, {
             include: [{
                 model: db.Roles,
@@ -34,7 +34,7 @@ const getUser = async (id) => {
 
 const createUser = async (userName, password, email, name, lastName, phone, photo, fkIdRoles) => {
     try {
-        // Sequelize manejará la llave foránea automáticamente
+        
         let newUser = await db.Users.create({
             userName,
             password,
@@ -47,7 +47,6 @@ const createUser = async (userName, password, email, name, lastName, phone, phot
         });
         return newUser;
     } catch (error) {
-        // El error de la llave foránea se mostrará aquí si el rol no existe
         return error.message || "User could not be created";
     }
 };

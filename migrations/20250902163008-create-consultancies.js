@@ -18,14 +18,8 @@ module.exports = {
       description: {
         type: Sequelize.STRING
       },
-      fkIdUsers: {  // ← ¡DEBE COINCIDIR EXACTAMENTE con el modelo!
-        type: Sequelize.INTEGER,
-        references: {  // ← Aquí agregamos la referencia directamente
-          model: 'Users',
-          key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'CASCADE'
+      fkIdUsers: {
+        type: Sequelize.INTEGER
       },
       createdAt: {
         allowNull: false,

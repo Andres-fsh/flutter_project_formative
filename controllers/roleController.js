@@ -30,7 +30,7 @@ else
 
 
 const updateRole = async (req, res) => {
-    let id = req.params.roleId; // Corregido: de rolId a roleId para que coincida con routes
+    let id = req.params.roleId; 
     let {name, description} = req.body;
     const updatedRole =await roleService.updateRole(id,name,description);
     if(updatedRole)
