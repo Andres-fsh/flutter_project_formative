@@ -7,6 +7,17 @@ module.exports = (sequelize, DataTypes) => {
         foreignKey: 'fkIdLinesSennova',  
         as: 'lineSennova' 
       });
+      
+      TypeForms.hasMany(models.ApplicationForms, {
+        foreignKey: 'fkIdTypeForms',
+        as: 'applicationForms'
+      });
+      
+    
+      TypeForms.hasMany(models.SatisfactionSurvey, {
+        foreignKey: 'fkIdTypeForms',
+        as: 'satisfactionSurveys'
+      });
     }
   }
   TypeForms.init({

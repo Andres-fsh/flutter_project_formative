@@ -1,4 +1,4 @@
-// Including Dependencies
+
 const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
@@ -9,7 +9,7 @@ if (process.env.NODE_ENV !== 'producion') {
     
 }
 
-// settings
+
 app.set('port', process.env.PORT || 4000);
 
 app.use(bodyParser.urlencoded({ extended: false }));
@@ -23,6 +23,9 @@ app.use('/api/v1/users', require('./api/v1/routes/users.routes'));
 app.use('/api/v1/consultancies', require('./api/v1/routes/consultancies.routes'));
 app.use('/api/v1/lineSennova', require('./api/v1/routes/lineSennova.routes'));
 app.use('/api/v1/typeForms', require('./api/v1/routes/typeForm.routes'));
+app.use('/api/v1/applicationForms', require('./api/v1/routes/applicationForm.routes'));
+app.use('/api/v1/satisfactionSurveys', require('./api/v1/routes/satisfactionSurvey.routes'));
+app.use('/api/v1/news', require('./api/v1/routes/news.routes'));
 
 
 app.listen(app.get('port'), () => {
