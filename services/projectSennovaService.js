@@ -1,24 +1,24 @@
 const db = require('../models');
 
-const getAllProjectSennovas = async () => {
+const getAllProjectsSennova = async () => {
     try {
-        let projectSennovas = await db.ProjectSennova.findAll({
+        let projectsSennova = await db.ProjectSennova.findAll({
             include: [
                 {
                     model: db.Consultancies,
                     as: 'consultancy',
-                    attributes: ['id', 'date', 'state', 'description']
+                    attributes: ['id', 'date', 'state', 'description', 'fkIdUsers']
                 },
                 {
                     model: db.LinesSennova,
                     as: 'lineSennova',
-                    attributes: ['id', 'name', 'description']
+                    attributes: ['id', 'name', 'description', 'fkIdUsers']
                 }
             ]
         });
-        return projectSennovas;
+        return projectsSennova;
     } catch (error) {
-        return error.message || "Failed to get project sennovas";
+        return error.message || "Failed to get projects sennova";
     }
 };
 
@@ -29,15 +29,16 @@ const getProjectSennova = async (id) => {
                 {
                     model: db.Consultancies,
                     as: 'consultancy',
-                    attributes: ['id', 'date', 'state', 'description']
+                    attributes: ['id', 'date', 'state', 'description', 'fkIdUsers']
                 },
                 {
                     model: db.LinesSennova,
                     as: 'lineSennova',
-                    attributes: ['id', 'name', 'description']
+                    attributes: ['id', 'name', 'description', 'fkIdUsers']
                 }
             ]
         });
+    
         return projectSennova;
     } catch (error) {
         return error.message || "Failed to get project sennova";
@@ -90,7 +91,7 @@ const deleteProjectSennova = async (id) => {
 };
 
 module.exports = {
-    getAllProjectSennovas,
+    getAllProjectsSennova,
     getProjectSennova,
     createProjectSennova,
     updateProjectSennova,

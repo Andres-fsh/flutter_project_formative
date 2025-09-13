@@ -1,8 +1,8 @@
 const db = require('../models');
 
-const getAllProjectsMonitorings = async () => {
+const getAllProjectsMonitoring = async () => {
     try {
-        let projectsMonitorings = await db.ProjectsMonitoring.findAll({
+        let projectsMonitoring = await db.ProjectsMonitoring.findAll({
             include: [
                 {
                     model: db.Users,
@@ -12,11 +12,11 @@ const getAllProjectsMonitorings = async () => {
                 {
                     model: db.ProjectSennova,
                     as: 'projectSennova',
-                    attributes: ['id', 'name', 'description'] 
+                    attributes: ['id', 'name', 'description', 'startDate', 'endDate']
                 }
             ]
         });
-        return projectsMonitorings;
+        return projectsMonitoring;
     } catch (error) {
         return error.message || "Failed to get projects monitoring";
     }
@@ -34,10 +34,11 @@ const getProjectsMonitoring = async (id) => {
                 {
                     model: db.ProjectSennova,
                     as: 'projectSennova',
-                    attributes: ['id', 'name', 'description']
+                    attributes: ['id', 'name', 'description', 'startDate', 'endDate']
                 }
             ]
         });
+    
         return projectsMonitoring;
     } catch (error) {
         return error.message || "Failed to get projects monitoring";
@@ -90,7 +91,7 @@ const deleteProjectsMonitoring = async (id) => {
 };
 
 module.exports = {
-    getAllProjectsMonitorings,
+    getAllProjectsMonitoring,
     getProjectsMonitoring,
     createProjectsMonitoring,
     updateProjectsMonitoring,

@@ -1,11 +1,11 @@
 const projectsMonitoringService = require('../services/projectsMonitoringService');
 
-const getAllProjectsMonitorings = async (req, res) => {
-    const allProjectsMonitorings = await projectsMonitoringService.getAllProjectsMonitorings();
-    if (allProjectsMonitorings)
-        res.status(200).send({ status: "OK", data: allProjectsMonitorings });
+const getAllProjectsMonitoring = async (req, res) => {
+    const allProjectsMonitoring = await projectsMonitoringService.getAllProjectsMonitoring();
+    if (allProjectsMonitoring)
+        res.status(200).send({ status: "OK", data: allProjectsMonitoring });
     else
-        res.status(400).send({ status: "FAILED", data: allProjectsMonitorings});
+        res.status(400).send({ status: "FAILED", data: allProjectsMonitoring});
 };
 
 const getProjectsMonitoring = async (req, res) => {
@@ -21,11 +21,11 @@ const getProjectsMonitoring = async (req, res) => {
 const createProjectsMonitoring = async (req, res) => {
     const { body } = req;
     const createdProjectsMonitoring = await projectsMonitoringService.createProjectsMonitoring(
-        body.phase,
-        body.state,
-        body.description,
-        body.registrationDate,
-        body.fkIdUsers,
+        body.phase, 
+        body.state, 
+        body.description, 
+        body.registrationDate, 
+        body.fkIdUsers, 
         body.fkIdProjectSennova
     );
    if(createdProjectsMonitoring)
@@ -56,7 +56,7 @@ const deleteProjectsMonitoring = async (req, res) => {
          res.status(400).send({ status: "FAILED", data: deletedProjectsMonitoring });
 };
 module.exports = {
-    getAllProjectsMonitorings,
+    getAllProjectsMonitoring,
     getProjectsMonitoring,
     createProjectsMonitoring,
     updateProjectsMonitoring,

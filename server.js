@@ -28,7 +28,7 @@ app.use('/api/v1/satisfactionSurveys', require('./api/v1/routes/satisfactionSurv
 app.use('/api/v1/news', require('./api/v1/routes/news.routes'));
 app.use('/api/v1/informationSennova', require('./api/v1/routes/informationSennova.routes'));
 app.use('/api/v1/projectSennovas', require('./api/v1/routes/projectSennova.routes'));
-
+app.use('/api/v1/projectsMonitoring', require('./api/v1/routes/projectsMonitoring.routes'));
 
 
 app.listen(app.get('port'), () => {

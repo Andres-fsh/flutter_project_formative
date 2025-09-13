@@ -1,11 +1,11 @@
 const projectSennovaService = require('../services/projectSennovaService');
 
-const getAllProjectSennovas = async (req, res) => {
-    const allProjectSennovas = await projectSennovaService.getAllProjectSennovas();
-    if (allProjectSennovas)
-        res.status(200).send({ status: "OK", data: allProjectSennovas });
+const getAllProjectsSennova = async (req, res) => {
+    const allProjectsSennova = await projectSennovaService.getAllProjectsSennova();
+    if (allProjectsSennova)
+        res.status(200).send({ status: "OK", data: allProjectsSennova });
     else
-        res.status(400).send({ status: "FAILED", data: allProjectSennovas});
+        res.status(400).send({ status: "FAILED", data: allProjectsSennova});
 };
 
 const getProjectSennova = async (req, res) => {
@@ -21,11 +21,11 @@ const getProjectSennova = async (req, res) => {
 const createProjectSennova = async (req, res) => {
     const { body } = req;
     const createdProjectSennova = await projectSennovaService.createProjectSennova(
-        body.name,
-        body.description,
-        body.startDate,
-        body.endDate,
-        body.fkIdConsultancies,
+        body.name, 
+        body.description, 
+        body.startDate, 
+        body.endDate, 
+        body.fkIdConsultancies, 
         body.fkIdLinesSennova
     );
    if(createdProjectSennova)
@@ -56,7 +56,7 @@ const deleteProjectSennova = async (req, res) => {
          res.status(400).send({ status: "FAILED", data: deletedProjectSennova });
 };
 module.exports = {
-    getAllProjectSennovas,
+    getAllProjectsSennova,
     getProjectSennova,
     createProjectSennova,
     updateProjectSennova,
