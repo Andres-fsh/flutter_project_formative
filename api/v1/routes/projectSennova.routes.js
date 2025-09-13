@@ -1,4 +1,3 @@
-const db = require('../../../models');
 const { Router } = require('express');
 const projectSennovaController = require('../../../controllers/projectSennovaController');
 
