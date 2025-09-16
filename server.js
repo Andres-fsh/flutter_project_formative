@@ -4,7 +4,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 
-if (process.env.NODE_ENV !== 'producion') {
+if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
     
 }
