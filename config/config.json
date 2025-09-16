@@ -11,13 +11,19 @@
     "password": null,
     "database": "database_test",
     "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "mysql"                
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "username": "nnovaweb_db_user",
+    "password": "A3IAHXfgbaLQ0956lebtwnq60Yz7LGtr ",
+    "database": "nnovaweb_db",
+    "host": "dpg-d31ftt0gjchc73b1i6u0-a",
+    "dialect": "postgres",
+    "dialectOptions": {
+      "ssl":{
+        "require": true,
+        "rejectUnauthorized": false
+      }
+    }
   }
 }
