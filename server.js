@@ -1,16 +1,24 @@
-
 const express = require('express');
+const cors = require('cors'); 
 const app = express();
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
 
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
-    
 }
 
-
 app.set('port', process.env.PORT || 4000);
+
+
+app.use(cors({
+    origin: ['http://localhost:58466', 'http://localhost:3000', 'http://localhost:8080'],
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
+}));
+
+
 
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
@@ -29,7 +37,6 @@ app.use('/api/v1/news', require('./api/v1/routes/news.routes'));
 app.use('/api/v1/informationSennova', require('./api/v1/routes/informationSennova.routes'));
 app.use('/api/v1/projectSennovas', require('./api/v1/routes/projectSennova.routes'));
 app.use('/api/v1/projectsMonitoring', require('./api/v1/routes/projectsMonitoring.routes'));
-
 
 app.listen(app.get('port'), () => {
     console.log(`Server running on http://localhost:${app.get('port')}`);
