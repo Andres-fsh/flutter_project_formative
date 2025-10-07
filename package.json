@@ -18,8 +18,8 @@
   },
   "homepage": "https://github.com/Andres-fsh/flutter_project_formative#readme",
   "dependencies": {
+    "cors": "^2.8.5",
     "express": "^5.1.0",
-    "cors": "^2.8.5",  
     "morgan": "^1.10.1",
     "mysql2": "^3.14.4",
     "pg": "^8.16.3",
