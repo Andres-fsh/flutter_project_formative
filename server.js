@@ -1,5 +1,5 @@
 const express = require('express');
-const cors = require('cors'); 
+const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
@@ -11,15 +11,7 @@ if (process.env.NODE_ENV !== 'production') {
 app.set('port', process.env.PORT || 4000);
 
 
-app.use(cors({
-    origin: ['http://localhost:58466', 'http://localhost:3000', 'http://localhost:8080'],
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'Accept']
-}));
-
-
-
+app.use(cors());  
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(morgan('dev'));
