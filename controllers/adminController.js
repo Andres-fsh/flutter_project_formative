@@ -92,7 +92,11 @@ module.exports = {
             lastName: user.lastname,
             phone: user.phone,
             photo: user.photo,
+<<<<<<< HEAD
             role: roleObj, // Cambié 'rol' por 'role' para consistencia
+=======
+            role: roleObj, 
+>>>>>>> c8e7513e5cfebfab5fe0b8d7664d80dc9b057d3c
           },
         },
       });

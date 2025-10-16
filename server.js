@@ -16,6 +16,10 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> c8e7513e5cfebfab5fe0b8d7664d80dc9b057d3c
 app.use('/api/v1/admin', require('./api/v1/routes/admin.routes'));
 app.use('/api/v1/roles', require('./api/v1/routes/roles.routes'));
 app.use('/api/v1/categoriesNews', require('./api/v1/routes/categoriesNews.routes'));
