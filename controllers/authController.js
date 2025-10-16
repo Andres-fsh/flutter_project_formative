@@ -7,8 +7,12 @@ const Users = db.Users;
 const Roles = db.Roles;
 
 function signToken(payload) {
-  const secret = process.env.JWT_SECRET;
+  // ✅ Usa la variable de entorno o un fallback seguro
+  const secret = process.env.JWT_SECRET || 'fallback-secret-key-temporal-cambiar-en-produccion';
   const expiresIn = process.env.JWT_EXPIRES_IN || '8h';
+  
+  console.log('🔐 JWT Secret Status:', process.env.JWT_SECRET ? '✅ CONFIGURED' : '❌ NOT CONFIGURED - using fallback');
+  
   return jwt.sign(payload, secret, { expiresIn });
 }
 
@@ -16,7 +20,7 @@ async function findUserByEmail(login) {
   try {
     return await Users.findOne({
       where: { email: login },
-      attributes: ['id', 'name', 'lastName', 'email', 'phone', 'photo', 'password', 'fkIdRoles'], // ✅ fkIdRoles con S
+      attributes: ['id', 'name', 'lastName', 'email', 'phone', 'photo', 'password', 'fkIdRoles'],
     });
   } catch (error) {
     console.error('Error en findUserByEmail:', error);
@@ -68,7 +72,7 @@ module.exports = {
         return res.status(401).json({ status: 'Error', message: 'Usuario o contraseña inválidos' });
       }
 
-      // Traemos el rol por FK - ✅ CORREGIDO: fkIdRoles
+      // Traemos el rol por FK
       let roleObj = null;
       if (user.fkIdRoles) {
         const role = await Roles.findByPk(user.fkIdRoles, { attributes: ['id', 'name'] });
@@ -92,6 +96,7 @@ module.exports = {
 
       const token = signToken(payload);
       console.log('✅ Login successful for user:', user.email);
+      console.log('✅ Token generated successfully');
 
       return res.status(200).json({
         status: 'OK',
@@ -127,7 +132,8 @@ module.exports = {
       const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null;
       if (!token) return res.status(401).json({ status: 'Error', message: 'Token requerido' });
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      const secret = process.env.JWT_SECRET || 'fallback-secret-key-temporal-cambiar-en-produccion';
+      const decoded = jwt.verify(token, secret);
       return res.status(200).json({ status: 'OK', data: { valid: true, user: decoded } });
     } catch (err) {
       return res.status(401).json({ status: 'Error', message: 'Token inválido o expirado' });
