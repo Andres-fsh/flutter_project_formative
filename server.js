@@ -5,8 +5,10 @@ const bodyParser = require('body-parser');
 const morgan = require('morgan');
 const path = require('path');
 
-// Cargar .env SIEMPRE
-require('dotenv').config();
+// Cargar .env SOLO en desarrollo/local
+if (process.env.NODE_ENV !== 'production') {
+  try { require('dotenv').config(); } catch (e) {}
+}
 
 app.set('port', process.env.PORT || 4000);
 
@@ -15,7 +17,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 
-// Servir estáticos (fotos subidas y cualquier otro asset bajo /public)
+// Servir estáticos (p. ej. /public/uploads/users/...)
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Rutas
