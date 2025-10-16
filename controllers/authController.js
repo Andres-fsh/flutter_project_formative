@@ -13,12 +13,15 @@ function signToken(payload) {
 }
 
 async function findUserByEmail(login) {
-  // En tu BD actual no hay userName, así que vamos por email directo
-  return Users.findOne({
-    where: { email: login },
-    // aseguramos traer estos campos
-    attributes: ['id', 'name', 'lastname', 'email', 'phone', 'photo', 'password', 'fkIdRol'],
-  });
+  try {
+    return await Users.findOne({
+      where: { email: login },
+      attributes: ['id', 'name', 'lastName', 'email', 'phone', 'photo', 'password', 'fkIdRoles'], // ✅ fkIdRoles con S
+    });
+  } catch (error) {
+    console.error('Error en findUserByEmail:', error);
+    throw error;
+  }
 }
 
 async function comparePassword(input, stored) {
@@ -29,7 +32,7 @@ async function comparePassword(input, stored) {
       stored.startsWith('$2b$') ||
       stored.startsWith('$2y$');
     if (isHash) return await bcrypt.compare(input, stored);
-    return input === stored; // modo legado (texto plano)
+    return input === stored;
   } catch {
     return false;
   }
@@ -39,26 +42,44 @@ module.exports = {
   // POST /api/v1/auth/login
   async login(req, res) {
     try {
+      console.log('🔐 Login attempt with:', req.body);
+      
       const { email, password } = req.body || {};
+      
       if (!email || !password) {
+        console.log('❌ Missing credentials');
         return res.status(400).json({ status: 'Error', message: 'Faltan credenciales' });
       }
 
       const user = await findUserByEmail(email);
+      console.log('👤 User found:', user ? `Yes (ID: ${user.id})` : 'No');
+      
       if (!user) {
         return res.status(401).json({ status: 'Error', message: 'Usuario o contraseña inválidos' });
       }
 
+      console.log('🔑 Stored password:', user.password ? 'Exists' : 'Missing');
+      console.log('🎭 User role ID (fkIdRoles):', user.fkIdRoles);
+
       const ok = await comparePassword(password, user.password);
+      console.log('🔑 Password match:', ok);
+      
       if (!ok) {
         return res.status(401).json({ status: 'Error', message: 'Usuario o contraseña inválidos' });
       }
 
-      // Traemos el rol por FK, evitando dependencias de asociaciones
+      // Traemos el rol por FK - ✅ CORREGIDO: fkIdRoles
       let roleObj = null;
-      if (user.fkIdRol) {
-        const role = await Roles.findByPk(user.fkIdRol, { attributes: ['id', 'name'] });
-        if (role) roleObj = { id: role.id, name: role.name };
+      if (user.fkIdRoles) {
+        const role = await Roles.findByPk(user.fkIdRoles, { attributes: ['id', 'name'] });
+        if (role) {
+          roleObj = { id: role.id, name: role.name };
+          console.log('🎭 Role found:', roleObj);
+        } else {
+          console.log('❌ Role not found for ID:', user.fkIdRoles);
+        }
+      } else {
+        console.log('❌ No role ID (fkIdRoles) for user');
       }
 
       const payload = {
@@ -66,10 +87,11 @@ module.exports = {
         email: user.email,
         rol: roleObj,
         name: user.name || '',
-        lastName: user.lastname || '',
+        lastName: user.lastName || '',
       };
 
       const token = signToken(payload);
+      console.log('✅ Login successful for user:', user.email);
 
       return res.status(200).json({
         status: 'OK',
@@ -78,10 +100,9 @@ module.exports = {
           token,
           user: {
             id: user.id,
-            userName: null, // en tu esquema actual no existe
             email: user.email,
             name: user.name,
-            lastName: user.lastname,
+            lastName: user.lastName,
             phone: user.phone,
             photo: user.photo,
             rol: roleObj,
@@ -89,8 +110,13 @@ module.exports = {
         },
       });
     } catch (err) {
-      console.error('Auth.login error:', err);
-      return res.status(500).json({ status: 'Error', message: 'Error interno' });
+      console.error('❌ Auth.login error:', err);
+      console.error('❌ Error stack:', err.stack);
+      return res.status(500).json({ 
+        status: 'Error', 
+        message: 'Error interno del servidor',
+        details: process.env.NODE_ENV === 'production' ? undefined : err.message
+      });
     }
   },
 
