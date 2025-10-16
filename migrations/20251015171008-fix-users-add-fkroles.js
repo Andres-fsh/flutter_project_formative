@@ -15,10 +15,7 @@ module.exports = {
         );
       }
 
-      // 2) Asegurar que la tabla de referencia sea 'roles' (NO 'rols')
-      //    Si por error existe 'rols', la ignoramos (o elimínala luego manualmente).
-
-      // 3) Asegurar la FK fk_users_roles -> roles(id)
+      // 2) Asegurar FK fk_users_roles -> roles(id)
       const fks = await queryInterface.getForeignKeyReferencesForTable('users');
       const hasFK = fks.some(fk => fk.constraintName === 'fk_users_roles');
       if (!hasFK) {
@@ -43,9 +40,9 @@ module.exports = {
   async down (queryInterface, Sequelize) {
     const t = await queryInterface.sequelize.transaction();
     try {
-      // Eliminar FK si existe
+      // Quitar FK si existe
       try { await queryInterface.removeConstraint('users', 'fk_users_roles', { transaction: t }); } catch (_) {}
-      // Eliminar columna si existe
+      // Quitar columna si existe
       const usersDesc = await queryInterface.describeTable('users');
       if (usersDesc.fkIdRoles) {
         await queryInterface.removeColumn('users', 'fkIdRoles', { transaction: t });
