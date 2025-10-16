@@ -3,21 +3,22 @@ const cors = require('cors');
 const app = express();
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const path = require('path');
 
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config();
-}
+// Cargar .env SIEMPRE
+require('dotenv').config();
 
 app.set('port', process.env.PORT || 4000);
 
-
-app.use(cors());  
+app.use(cors());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 app.use(morgan('dev'));
 
+// Servir estáticos (fotos subidas y cualquier otro asset bajo /public)
+app.use('/public', express.static(path.join(__dirname, 'public')));
 
-
+// Rutas
 app.use('/api/v1/roles', require('./api/v1/routes/roles.routes'));
 app.use('/api/v1/categoriesNews', require('./api/v1/routes/categoriesNews.routes'));
 app.use('/api/v1/users', require('./api/v1/routes/users.routes'));
@@ -33,5 +34,5 @@ app.use('/api/v1/projectsMonitoring', require('./api/v1/routes/projectsMonitorin
 app.use('/api/v1/auth', require('./api/v1/routes/auth.routes'));
 
 app.listen(app.get('port'), () => {
-    console.log(`Server running on http://localhost:${app.get('port')}`);
+  console.log(`Server running on http://localhost:${app.get('port')}`);
 });
