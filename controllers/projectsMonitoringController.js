@@ -55,10 +55,42 @@ const deleteProjectsMonitoring = async (req, res) => {
         else
          res.status(400).send({ status: "FAILED", data: deletedProjectsMonitoring });
 };
+
+const getProjectsMonitoringByUserId = async (req, res) => {
+    try {
+        let userId = req.params.userId;
+        
+        let projectsMonitoring = await db.ProjectsMonitoring.findAll({
+            where: { fkIdUsers: userId },
+            include: [
+                {
+                    model: db.Users,
+                    as: 'user',
+                    attributes: ['id', 'userName', 'name', 'lastName', 'email']
+                },
+                {
+                    model: db.ProjectSennova,
+                    as: 'projectSennova',
+                    attributes: ['id', 'name', 'description', 'startDate', 'endDate']
+                }
+            ]
+        });
+        
+        if (projectsMonitoring && projectsMonitoring.length > 0) {
+            res.status(200).send({ status: "OK", data: projectsMonitoring[0] });
+        } else {
+            res.status(404).send({ status: "NOT_FOUND", message: "No se encontró proyecto para este usuario" });
+        }
+    } catch (error) {
+        console.error('Error en getProjectsMonitoringByUserId:', error);
+        res.status(500).send({ status: "ERROR", message: error.message });
+    }
+};
 module.exports = {
     getAllProjectsMonitoring,
     getProjectsMonitoring,
     createProjectsMonitoring,
     updateProjectsMonitoring,
-    deleteProjectsMonitoring
+    deleteProjectsMonitoring,
+    getProjectsMonitoringByUserId 
 };

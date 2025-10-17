@@ -4,6 +4,8 @@ const projectsMonitoringController = require('../../../controllers/projectsMonit
 
 const router = Router();
 
+
+router.get('/user/:userId', projectsMonitoringController.getProjectsMonitoringByUserId);
 router.get("/", projectsMonitoringController.getAllProjectsMonitoring);
 router.get('/:projectsMonitoringId', projectsMonitoringController.getProjectsMonitoring);
 router.post('/', projectsMonitoringController.createProjectsMonitoring);

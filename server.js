@@ -21,6 +21,7 @@ app.use(morgan('dev'));
 app.use('/public', express.static(path.join(__dirname, 'public')));
 
 // Rutas
+
 app.use('/api/v1/roles', require('./api/v1/routes/roles.routes'));
 app.use('/api/v1/categoriesNews', require('./api/v1/routes/categoriesNews.routes'));
 app.use('/api/v1/users', require('./api/v1/routes/users.routes'));
