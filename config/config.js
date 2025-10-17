@@ -24,10 +24,11 @@ module.exports = {
   production: {
     use_env_variable: "DATABASE_URL",
     dialect: "postgres",
-    dialectOptions: {
-      ssl: { require: true, rejectUnauthorized: false }
-    },
-    quoteIdentifiers: false,
-    logging:false
-  }
+    dialectOptions: { ssl: { require: true, rejectUnauthorized: false } },
+    logging: false,
+    migrationStorage: "sequelize",
+    migrationStorageTableName: "SequelizeMeta",
+    seederStorage: "sequelize",
+    seederStorageTableName: "SequelizeData"
+},
 };
