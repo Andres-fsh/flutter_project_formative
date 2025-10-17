@@ -4,10 +4,42 @@ const bcrypt = require('bcryptjs');
 const DEFAULT_AVATAR = '/public/images/default-avatar.png';
 
 const usersSeed = [
-  { userName: 'admin',    email: 'admin@nnovaweb.test',    name: 'Admin',  lastName: 'Root',    phone: 300000001, roleName: 'Administrador', password: 'admin123' },
-  { userName: 'coor',     email: 'coor@nnovaweb.test',     name: 'Coor',   lastName: 'Dinator', phone: 300000002, roleName: 'Coordinador',   password: '123456'   },
-  { userName: 'invest',   email: 'invest@nnovaweb.test',   name: 'Inves',  lastName: 'Tigator', phone: 300000003, roleName: 'Investigador',  password: '123456'   },
-  { userName: 'aprendiz', email: 'aprendiz@nnovaweb.test', name: 'Apren',  lastName: 'Diz',     phone: 300000004, roleName: 'Aprendiz',      password: '123456'   }
+  { 
+    userName: 'admin',    
+    email: 'admin@nnovaweb.test',    
+    name: 'Admin',  
+    lastName: 'Root',    
+    phone: '3000000001', 
+    roleName: 'Administrador', 
+    password: 'admin123' 
+  },
+  { 
+    userName: 'coor',     
+    email: 'coor@nnovaweb.test',     
+    name: 'Coor',   
+    lastName: 'Dinator', 
+    phone: '3000000002', 
+    roleName: 'Coordinador',   
+    password: '123456'   
+  },
+  { 
+    userName: 'invest',   
+    email: 'invest@nnovaweb.test',   
+    name: 'Inves',  
+    lastName: 'Tigator', 
+    phone: '3000000003', 
+    roleName: 'Investigador',  
+    password: '123456'   
+  },
+  { 
+    userName: 'aprendiz', 
+    email: 'aprendiz@nnovaweb.test', 
+    name: 'Apren',  
+    lastName: 'Diz',     
+    phone: '3000000004', 
+    roleName: 'Aprendiz',      
+    password: '123456'   
+  }
 ];
 
 module.exports = {
@@ -38,7 +70,7 @@ module.exports = {
       const kCreatedAt = colName('createdAt','created_at');
       const kUpdatedAt = colName('updatedAt','updated_at');
 
-      // 1) Mapea roles por nombre -> id
+   
       const [roles] = await queryInterface.sequelize.query(
         "SELECT id, name FROM `roles` WHERE name IN ('Administrador','Coordinador','Investigador','Aprendiz');",
         { transaction: t }
@@ -49,7 +81,7 @@ module.exports = {
       const rows = [];
 
       for (const u of usersSeed) {
-        // Evita duplicados por email (si existe esa columna)
+       
         if (kEmail) {
           const [exists] = await queryInterface.sequelize.query(
             "SELECT id FROM `users` WHERE `" + kEmail + "`=? LIMIT 1;",
@@ -64,7 +96,7 @@ module.exports = {
         if (kEmail)     row[kEmail]     = u.email;
         if (kName)      row[kName]      = u.name;
         if (kLastName)  row[kLastName]  = u.lastName;
-        if (kPhone)     row[kPhone]     = u.phone;
+        if (kPhone)     row[kPhone]     = u.phone; // ✅ Ya es string directamente
         if (kPhoto)     row[kPhoto]     = DEFAULT_AVATAR;
         if (kFkRole)    row[kFkRole]    = roleIdByName[u.roleName] || null;
         if (kCreatedAt) row[kCreatedAt] = now;
@@ -85,7 +117,7 @@ module.exports = {
   },
 
   async down (queryInterface) {
-    // Borra por email si existe columna; si no, borra por límites
+    
     try {
       await queryInterface.bulkDelete('users', {
         email: usersSeed.map(u => u.email)

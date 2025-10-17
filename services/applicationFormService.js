@@ -32,41 +32,65 @@ const getApplicationForm = async (id) => {
 };
 
 const createApplicationForm = async (userType, name, identificationType, email, phone, companyName, description, fkIdTypeForms) => {
-    try {
-        let newApplicationForm = await db.ApplicationForms.create({
-            userType,
-            name,
-            identificationType,
-            email,
-            phone,
-            companyName,
-            description,
-            fkIdTypeForms
-        });
-        return newApplicationForm;
-    } catch (error) {
-        return error.message || "Application form could not be created";
-    }
+  try {
+    let newApplicationForm = await db.ApplicationForms.create({
+      userType,
+      name,
+      identificationType,
+      email,
+      phone,
+      companyName,
+      description,
+      fkIdTypeForms
+    });
+
+    
+    const formWithType = await db.ApplicationForms.findByPk(newApplicationForm.id, {
+      include: [{
+        model: db.TypeForms,
+        as: 'typeForm',
+        attributes: ['id', 'description']
+      }]
+    });
+
+    return formWithType;
+  } catch (error) {
+    throw new Error(error.message || "Application form could not be created");
+  }
 };
 
 const updateApplicationForm = async (id, userType, name, identificationType, email, phone, companyName, description, fkIdTypeForms) => {
-    try {
-        let updatedApplicationForm = await db.ApplicationForms.update({
-            userType,
-            name,
-            identificationType,
-            email,
-            phone,
-            companyName,
-            description,
-            fkIdTypeForms
-        }, {
-            where: { id }
-        });
-        return updatedApplicationForm;
-    } catch (error) {
-        return error.message || "Application form could not be updated";
+  try {
+    
+    const [updatedCount] = await db.ApplicationForms.update({
+      userType,
+      name,
+      identificationType,
+      email,
+      phone,
+      companyName,
+      description,
+      fkIdTypeForms
+    }, {
+      where: { id }
+    });
+
+    
+    if (updatedCount > 0) {
+      const updatedForm = await db.ApplicationForms.findByPk(id, {
+        include: [{
+          model: db.TypeForms,
+          as: 'typeForm',
+          attributes: ['id', 'description']
+        }]
+      });
+      return updatedForm;
+    } else {
+      throw new Error("Formulario no encontrado o no se pudo actualizar");
     }
+  } catch (error) {
+    throw new Error(error.message || "Application form could not be updated");
+  }
 };
 
 const deleteApplicationForm = async (id) => {

@@ -12,7 +12,16 @@ module.exports = {
       const now = new Date();
 
       const items = [
-        { userType: 'Externo', name: 'Empresa XYZ', identificationType: 'NIT', email: 'contacto@xyz.com', phone: 111222333, companyName: 'XYZ SAS', description: 'Requiere asesoría en innovación', fkIdTypeForms: tfId },
+        { 
+          userType: 'Externo', 
+          name: 'Empresa XYZ', 
+          identificationType: 'NIT', 
+          email: 'contacto@xyz.com', 
+          phone: '3112223334',
+          companyName: 'XYZ SAS', 
+          description: 'Requiere asesoria en innovacion', 
+          fkIdTypeForms: tfId 
+        },
       ];
 
       for (const it of items) {
@@ -22,10 +31,16 @@ module.exports = {
         );
         if (!rows.length) {
           await queryInterface.bulkInsert('applicationforms', [{
-            userType: it.userType, name: it.name, identificationType: it.identificationType,
-            email: it.email, phone: it.phone, companyName: it.companyName,
-            description: it.description, fkIdTypeForms: it.fkIdTypeForms,
-            createdAt: now, updatedAt: now
+            userType: it.userType, 
+            name: it.name, 
+            identificationType: it.identificationType,
+            email: it.email, 
+            phone: it.phone, 
+            companyName: it.companyName,
+            description: it.description, 
+            fkIdTypeForms: it.fkIdTypeForms,
+            createdAt: now, 
+            updatedAt: now
           }], { transaction: t });
         }
       }
