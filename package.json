@@ -8,9 +8,14 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
+
     "migrate": "npx sequelize-cli db:migrate",
     "seed": "npx sequelize-cli db:seed:all",
-    "render-postbuild": "npm run migrate && npm run seed"
+
+    "migrate:prod": "npx sequelize-cli db:migrate --env production",
+    "seed:prod": "npx sequelize-cli db:seed:all --env production",
+
+    "render-postbuild": "npm run migrate:prod"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

@@ -7,7 +7,7 @@ module.exports = {
       const now = new Date();
 
       const payload = {
-        mission: 'Impulsar la innovación y el conocimiento.',
+        mision: 'Impulsar la innovación y el conocimiento.',
         vision: 'Ser referente regional en investigación aplicada.',
         description: 'Centro de investigación y transferencia tecnológica.',
         staff: 'Equipo multidisciplinario',
