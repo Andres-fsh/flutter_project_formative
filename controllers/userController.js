@@ -55,12 +55,20 @@ const createUser = async (req, res) => {
   try {
     const { body } = req;
 
-    // si no envían photo, guarda el default en BD
     const photo = body.photo && body.photo.trim() !== "" ? body.photo : (DEFAULT_AVATAR || null);
 
+
+    const phone = body.phone ? String(body.phone).replace(/\D/g, '') : null;
+
     const createdUser = await userService.createUser(
-      body.userName, body.password, body.email, body.name, body.lastName,
-      body.phone, photo, body.fkIdRoles
+      body.userName, 
+      body.password, 
+      body.email, 
+      body.name, 
+      body.lastName,
+      phone, 
+      photo, 
+      body.fkIdRoles
     );
 
     res.status(201).send({ status: "OK", data: mapUserOut(createdUser) });
@@ -69,16 +77,20 @@ const createUser = async (req, res) => {
   }
 };
 
+
 const updateUser = async (req, res) => {
   try {
     const id = req.params.userId;
     let { userName, password, email, name, lastName, phone, photo, fkIdRoles } = req.body;
 
-    // si no mandan photo (o vacía), guarda el default en BD
+   
     if (!photo || photo.trim() === "") photo = (DEFAULT_AVATAR || null);
 
+    
+    const cleanPhone = phone ? String(phone).replace(/\D/g, '') : null;
+
     const updatedUser = await userService.updateUser(
-      id, userName, password, email, name, lastName, phone, photo, fkIdRoles
+      id, userName, password, email, name, lastName, cleanPhone, photo, fkIdRoles
     );
 
     res.status(200).send({ status: "OK", data: mapUserOut(updatedUser) });

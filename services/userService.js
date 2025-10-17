@@ -33,42 +33,64 @@ const getUser = async (id) => {
 };
 
 const createUser = async (userName, password, email, name, lastName, phone, photo, fkIdRoles) => {
-    try {
-        
-        let newUser = await db.Users.create({
-            userName,
-            password,
-            email,
-            name,
-            lastName,
-            phone,
-            photo,
-            fkIdRoles
-        });
-        return newUser;
-    } catch (error) {
-        return error.message || "User could not be created";
-    }
+  try {
+    let newUser = await db.Users.create({
+      userName,
+      password,
+      email,
+      name,
+      lastName,
+      phone,
+      photo,
+      fkIdRoles
+    });
+
+  
+    const userWithRole = await db.Users.findByPk(newUser.id, {
+      include: [{
+        model: db.Roles,
+        as: 'role',
+        attributes: ['id', 'name']
+      }]
+    });
+
+    return userWithRole;
+  } catch (error) {
+    throw new Error(error.message || "User could not be created");
+  }
 };
 
 const updateUser = async (id, userName, password, email, name, lastName, phone, photo, fkIdRoles) => {
-    try {
-        let updatedUser = await db.Users.update({
-            userName,
-            password,
-            email,
-            name,
-            lastName,
-            phone,
-            photo,
-            fkIdRoles
-        }, {
-            where: { id }
-        });
-        return updatedUser;
-    } catch (error) {
-        return error.message || "User could not be updated";
+  try {
+    
+    const [updatedCount] = await db.Users.update({
+      userName,
+      password,
+      email,
+      name,
+      lastName,
+      phone,
+      photo,
+      fkIdRoles
+    }, {
+      where: { id }
+    });
+
+    if (updatedCount > 0) {
+      const updatedUser = await db.Users.findByPk(id, {
+        include: [{
+          model: db.Roles,
+          as: 'role',
+          attributes: ['id', 'name']
+        }]
+      });
+      return updatedUser;
+    } else {
+      throw new Error("Usuario no encontrado o no se pudo actualizar");
     }
+  } catch (error) {
+    throw new Error(error.message || "User could not be updated");
+  }
 };
 
 const deleteUser = async (id) => {
