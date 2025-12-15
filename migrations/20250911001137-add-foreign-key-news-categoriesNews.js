@@ -4,11 +4,11 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     const t = await queryInterface.sequelize.transaction();
     try {
-      const table = 'news';
-      const refTable = 'categoriesnews';
+      const table = 'News';
+      const refTable = 'CategoriesNews';
 
-      // 1) Asegurar columna fkIdCategoriesNews en 'news'
-      const desc = await queryInterface.describeTable(table);
+      // 1) Asegurar columna fkIdCategoriesNews en 'News'
+      const desc = await queryInterface.describeTable(table, { transaction: t });
       if (!desc.fkIdCategoriesNews) {
         await queryInterface.addColumn(
           table,
@@ -18,9 +18,12 @@ module.exports = {
         );
       }
 
-      // 2) Asegurar FK -> categoriesnews(id)
-      const fks = await queryInterface.getForeignKeyReferencesForTable(table);
-      const hasFK = fks.some(fk => fk.constraintName === 'fk_news_categoriesnews');
+      // 2) Asegurar FK -> CategoriesNews(id)
+      const fks = await queryInterface.getForeignKeyReferencesForTable(table, { transaction: t });
+
+      const hasFK =
+        fks.some(fk => fk.constraintName === 'fk_news_categoriesnews') ||
+        fks.some(fk => fk.columnName === 'fkIdCategoriesNews' && fk.referencedTableName === refTable);
 
       if (!hasFK) {
         await queryInterface.addConstraint(table, {
@@ -41,16 +44,18 @@ module.exports = {
     }
   },
 
-  async down (queryInterface, Sequelize) {
+  async down (queryInterface) {
     const t = await queryInterface.sequelize.transaction();
     try {
-      const table = 'news';
+      const table = 'News';
 
       // Quitar FK si existe
-      try { await queryInterface.removeConstraint(table, 'fk_news_categoriesnews', { transaction: t }); } catch (_) {}
+      try {
+        await queryInterface.removeConstraint(table, 'fk_news_categoriesnews', { transaction: t });
+      } catch (_) {}
 
       // Quitar columna si existe
-      const desc = await queryInterface.describeTable(table);
+      const desc = await queryInterface.describeTable(table, { transaction: t });
       if (desc.fkIdCategoriesNews) {
         await queryInterface.removeColumn(table, 'fkIdCategoriesNews', { transaction: t });
       }

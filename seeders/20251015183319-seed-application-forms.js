@@ -1,56 +1,80 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface) {
+  async up (queryInterface, Sequelize) {
     const t = await queryInterface.sequelize.transaction();
     try {
-      const [tf] = await queryInterface.sequelize.query(
-        "SELECT id FROM `typeforms` WHERE `description`=? LIMIT 1;",
-        { replacements: ['Solicitud de asesoría'], transaction: t }
+      const typeFormsTable = 'TypeForms';
+      const applicationFormsTable = 'ApplicationForms';
+
+      // Buscar typeform "Solicitud de asesoría"
+      const tfRows = await queryInterface.sequelize.query(
+        `SELECT id FROM "${typeFormsTable}" WHERE description = :desc LIMIT 1;`,
+        {
+          replacements: { desc: 'Solicitud de asesoría' },
+          type: Sequelize.QueryTypes.SELECT,
+          transaction: t
+        }
       );
-      const tfId = tf.length ? tf[0].id : null;
+      const tfId = tfRows.length ? tfRows[0].id : null;
+
       const now = new Date();
 
       const items = [
-        { 
-          userType: 'Externo', 
-          name: 'Empresa XYZ', 
-          identificationType: 'NIT', 
-          email: 'contacto@xyz.com', 
+        {
+          userType: 'Externo',
+          name: 'Empresa XYZ',
+          identificationType: 'NIT',
+          email: 'contacto@xyz.com',
           phone: '3112223334',
-          companyName: 'XYZ SAS', 
-          description: 'Requiere asesoria en innovacion', 
-          fkIdTypeForms: tfId 
-        },
+          companyName: 'XYZ SAS',
+          description: 'Requiere asesoria en innovacion',
+          fkIdTypeForms: tfId
+        }
       ];
 
       for (const it of items) {
-        const [rows] = await queryInterface.sequelize.query(
-          "SELECT id FROM `applicationforms` WHERE `email`=? AND `name`=? LIMIT 1;",
-          { replacements: [it.email, it.name], transaction: t }
+        const existing = await queryInterface.sequelize.query(
+          `SELECT id FROM "${applicationFormsTable}" WHERE email = :email AND name = :name LIMIT 1;`,
+          {
+            replacements: { email: it.email, name: it.name },
+            type: Sequelize.QueryTypes.SELECT,
+            transaction: t
+          }
         );
-        if (!rows.length) {
-          await queryInterface.bulkInsert('applicationforms', [{
-            userType: it.userType, 
-            name: it.name, 
-            identificationType: it.identificationType,
-            email: it.email, 
-            phone: it.phone, 
-            companyName: it.companyName,
-            description: it.description, 
-            fkIdTypeForms: it.fkIdTypeForms,
-            createdAt: now, 
-            updatedAt: now
-          }], { transaction: t });
+
+        if (!existing.length) {
+          await queryInterface.bulkInsert(
+            applicationFormsTable,
+            [{
+              userType: it.userType,
+              name: it.name,
+              identificationType: it.identificationType,
+              email: it.email,
+              phone: it.phone,
+              companyName: it.companyName,
+              description: it.description,
+              fkIdTypeForms: it.fkIdTypeForms,
+              createdAt: now,
+              updatedAt: now
+            }],
+            { transaction: t }
+          );
         }
       }
 
       await t.commit();
-    } catch (e) { await t.rollback(); throw e; }
+    } catch (e) {
+      await t.rollback();
+      throw e;
+    }
   },
+
   async down (queryInterface) {
-    await queryInterface.bulkDelete('applicationforms', {
-      email: ['contacto@xyz.com']
-    }, {});
+    await queryInterface.bulkDelete(
+      'ApplicationForms',
+      { email: ['contacto@xyz.com'] },
+      {}
+    );
   }
 };

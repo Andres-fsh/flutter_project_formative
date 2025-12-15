@@ -1,9 +1,10 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface) {
+  async up (queryInterface, Sequelize) {
     const t = await queryInterface.sequelize.transaction();
     try {
+      const table = 'InformationSennovas';
       const now = new Date();
 
       const payload = {
@@ -18,21 +19,34 @@ module.exports = {
         updatedAt: now
       };
 
-      // Si ya hay un registro, no insertamos otro
-      const [exists] = await queryInterface.sequelize.query(
-        "SELECT id FROM `informationsennovas` LIMIT 1;", { transaction: t }
+      // Verificar si ya existe un registro
+      const existing = await queryInterface.sequelize.query(
+        `SELECT id FROM "${table}" LIMIT 1`,
+        { type: Sequelize.QueryTypes.SELECT, transaction: t }
       );
-      if (!exists.length) {
-        await queryInterface.bulkInsert('informationsennovas', [payload], { transaction: t });
+
+      if (!existing.length) {
+        await queryInterface.bulkInsert(
+          table,
+          [payload],
+          { transaction: t }
+        );
       }
 
       await t.commit();
-    } catch (e) { await t.rollback(); throw e; }
+    } catch (e) {
+      await t.rollback();
+      throw e;
+    }
   },
 
   async down (queryInterface) {
-    await queryInterface.bulkDelete('informationsennovas', {
-      description: 'Centro de investigación y transferencia tecnológica.'
-    }, {});
+    await queryInterface.bulkDelete(
+      'InformationSennovas',
+      {
+        description: 'Centro de investigación y transferencia tecnológica.'
+      },
+      {}
+    );
   }
 };

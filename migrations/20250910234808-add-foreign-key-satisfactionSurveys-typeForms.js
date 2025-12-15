@@ -4,11 +4,11 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     const t = await queryInterface.sequelize.transaction();
     try {
-      const table = 'satisfactionsurveys';
-      const refTable = 'typeforms';
+      const table = 'SatisfactionSurveys';
+      const refTable = 'TypeForms';
 
       // 1) asegurar columna fkIdTypeForms
-      const desc = await queryInterface.describeTable(table);
+      const desc = await queryInterface.describeTable(table, { transaction: t });
       if (!desc.fkIdTypeForms) {
         await queryInterface.addColumn(
           table,
@@ -18,9 +18,12 @@ module.exports = {
         );
       }
 
-      // 2) asegurar FK -> typeforms(id)
-      const fks = await queryInterface.getForeignKeyReferencesForTable(table);
-      const hasFK = fks.some(fk => fk.constraintName === 'fk_satisfactionsurveys_typeforms');
+      // 2) asegurar FK -> TypeForms(id)
+      const fks = await queryInterface.getForeignKeyReferencesForTable(table, { transaction: t });
+
+      const hasFK =
+        fks.some(fk => fk.constraintName === 'fk_satisfactionsurveys_typeforms') ||
+        fks.some(fk => fk.columnName === 'fkIdTypeForms' && fk.referencedTableName === refTable);
 
       if (!hasFK) {
         await queryInterface.addConstraint(table, {
@@ -41,16 +44,18 @@ module.exports = {
     }
   },
 
-  async down (queryInterface, Sequelize) {
+  async down (queryInterface) {
     const t = await queryInterface.sequelize.transaction();
     try {
-      const table = 'satisfactionsurveys';
+      const table = 'SatisfactionSurveys';
 
       // quitar FK si existe
-      try { await queryInterface.removeConstraint(table, 'fk_satisfactionsurveys_typeforms', { transaction: t }); } catch (_) {}
+      try {
+        await queryInterface.removeConstraint(table, 'fk_satisfactionsurveys_typeforms', { transaction: t });
+      } catch (_) {}
 
       // quitar columna si existe
-      const desc = await queryInterface.describeTable(table);
+      const desc = await queryInterface.describeTable(table, { transaction: t });
       if (desc.fkIdTypeForms) {
         await queryInterface.removeColumn(table, 'fkIdTypeForms', { transaction: t });
       }

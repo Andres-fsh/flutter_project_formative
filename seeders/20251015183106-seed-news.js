@@ -1,15 +1,23 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface) {
+  async up (queryInterface, Sequelize) {
     const t = await queryInterface.sequelize.transaction();
     try {
-      // busca categoría "Noticias"; si no existe, usa null
-      const [cat] = await queryInterface.sequelize.query(
-        "SELECT id FROM `categoriesnews` WHERE `name`=? LIMIT 1;",
-        { replacements: ['Noticias'], transaction: t }
+      const categoriesTable = 'CategoriesNews';
+      const newsTable = 'News';
+
+      // Buscar categoría "Noticias"; si no existe, usar null
+      const catRows = await queryInterface.sequelize.query(
+        `SELECT id FROM "${categoriesTable}" WHERE name = :name LIMIT 1;`,
+        {
+          replacements: { name: 'Noticias' },
+          type: Sequelize.QueryTypes.SELECT,
+          transaction: t
+        }
       );
-      const catId = cat.length ? cat[0].id : null;
+      const catId = catRows.length ? catRows[0].id : null;
+
       const now = new Date();
 
       const items = [
@@ -17,29 +25,48 @@ module.exports = {
         { title: 'Convocatoria abierta', summary: 'Se abre convocatoria para proyectos', picture: null, date: now }
       ];
 
-      for (const it of items) {
-        const [rows] = await queryInterface.sequelize.query(
-          "SELECT id FROM `news` WHERE `title`=? LIMIT 1;",
-          { replacements: [it.title], transaction: t }
-        );
-        if (!rows.length) {
-          await queryInterface.bulkInsert('news', [{
-            title: it.title,
-            summary: it.summary,
-            picture: it.picture,
-            date: it.date,
-            fkIdCategoriesNews: catId,
-            createdAt: now, updatedAt: now
-          }], { transaction: t });
+      // Traer títulos existentes para no duplicar (usar IN en vez de ANY)
+      const titles = items.map(i => i.title);
+
+      const existing = await queryInterface.sequelize.query(
+        `SELECT title FROM "${newsTable}" WHERE title IN (:titles);`,
+        {
+          replacements: { titles },
+          type: Sequelize.QueryTypes.SELECT,
+          transaction: t
         }
+      );
+
+      const existingSet = new Set(existing.map(r => r.title));
+
+      const toInsert = items
+        .filter(it => !existingSet.has(it.title))
+        .map(it => ({
+          title: it.title,
+          summary: it.summary,
+          picture: it.picture,
+          date: it.date,
+          fkIdCategoriesNews: catId,
+          createdAt: now,
+          updatedAt: now
+        }));
+
+      if (toInsert.length) {
+        await queryInterface.bulkInsert(newsTable, toInsert, { transaction: t });
       }
 
       await t.commit();
-    } catch (e) { await t.rollback(); throw e; }
+    } catch (e) {
+      await t.rollback();
+      throw e;
+    }
   },
+
   async down (queryInterface) {
-    await queryInterface.bulkDelete('news', {
-      title: ['Lanzamiento de proyecto SENNOVA','Convocatoria abierta']
-    }, {});
+    await queryInterface.bulkDelete(
+      'News',
+      { title: ['Lanzamiento de proyecto SENNOVA', 'Convocatoria abierta'] },
+      {}
+    );
   }
 };

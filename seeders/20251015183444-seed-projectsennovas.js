@@ -1,42 +1,75 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface) {
+  async up (queryInterface, Sequelize) {
     const t = await queryInterface.sequelize.transaction();
     try {
-      const [cons] = await queryInterface.sequelize.query(
-        "SELECT id FROM `consultancies` ORDER BY id ASC LIMIT 1;", { transaction: t }
+      const consultanciesTable = 'Consultancies';
+      const linesTable = 'LinesSennovas';
+      const projectsTable = 'ProjectSennovas';
+
+      // Tomar primera consultoría
+      const cons = await queryInterface.sequelize.query(
+        `SELECT id FROM "${consultanciesTable}" ORDER BY id ASC LIMIT 1;`,
+        { type: Sequelize.QueryTypes.SELECT, transaction: t }
       );
-      const [line] = await queryInterface.sequelize.query(
-        "SELECT id FROM `linessennovas` ORDER BY id ASC LIMIT 1;", { transaction: t }
+
+      // Tomar primera línea sennova
+      const line = await queryInterface.sequelize.query(
+        `SELECT id FROM "${linesTable}" ORDER BY id ASC LIMIT 1;`,
+        { type: Sequelize.QueryTypes.SELECT, transaction: t }
       );
-      if (!cons.length || !line.length) return; // no-op si falta dependencia
+
+      if (!cons.length || !line.length) {
+        await t.commit();
+        return; // no-op si falta dependencia
+      }
 
       const now = new Date();
+
       const item = {
         name: 'Proyecto Alpha',
         description: 'Piloto de innovación',
-        startDate: now, endDate: now,
+        startDate: now,
+        endDate: now,
         fkIdConsultancies: cons[0].id,
         fkIdLinesSennova: line[0].id
       };
 
-      const [exists] = await queryInterface.sequelize.query(
-        "SELECT id FROM `projectsennovas` WHERE `name`=? LIMIT 1;",
-        { replacements: [item.name], transaction: t }
+      // Verificar si ya existe
+      const exists = await queryInterface.sequelize.query(
+        `SELECT id FROM "${projectsTable}" WHERE name = :name LIMIT 1;`,
+        {
+          replacements: { name: item.name },
+          type: Sequelize.QueryTypes.SELECT,
+          transaction: t
+        }
       );
+
       if (!exists.length) {
-        await queryInterface.bulkInsert('projectsennovas', [{
-          ...item, createdAt: now, updatedAt: now
-        }], { transaction: t });
+        await queryInterface.bulkInsert(
+          projectsTable,
+          [{
+            ...item,
+            createdAt: now,
+            updatedAt: now
+          }],
+          { transaction: t }
+        );
       }
 
       await t.commit();
-    } catch (e) { await t.rollback(); throw e; }
+    } catch (e) {
+      await t.rollback();
+      throw e;
+    }
   },
+
   async down (queryInterface) {
-    await queryInterface.bulkDelete('projectsennovas', {
-      name: ['Proyecto Alpha']
-    }, {});
+    await queryInterface.bulkDelete(
+      'ProjectSennovas',
+      { name: ['Proyecto Alpha'] },
+      {}
+    );
   }
 };

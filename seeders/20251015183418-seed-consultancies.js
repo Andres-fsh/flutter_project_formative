@@ -1,40 +1,68 @@
 'use strict';
 
 module.exports = {
-  async up (queryInterface) {
+  async up (queryInterface, Sequelize) {
     const t = await queryInterface.sequelize.transaction();
     try {
-      // usa el primer usuario disponible (si no hay, no siembra)
-      const [usr] = await queryInterface.sequelize.query(
-        "SELECT id FROM `users` ORDER BY id ASC LIMIT 1;", { transaction: t }
+      const usersTable = 'Users';
+      const consultanciesTable = 'Consultancies';
+
+      // Usa el primer usuario disponible (si no hay, no siembra)
+      const usr = await queryInterface.sequelize.query(
+        `SELECT id FROM "${usersTable}" ORDER BY id ASC LIMIT 1;`,
+        { type: Sequelize.QueryTypes.SELECT, transaction: t }
       );
-      if (!usr.length) return; // no-op si no hay usuarios
+
+      if (!usr.length) {
+        await t.commit();
+        return; // no-op si no hay usuarios
+      }
 
       const uid = usr[0].id;
       const now = new Date();
+
       const items = [
         { date: now, state: 'Abierta', description: 'Asesoría inicial', fkIdUsers: uid }
       ];
 
       for (const it of items) {
-        const [rows] = await queryInterface.sequelize.query(
-          "SELECT id FROM `consultancies` WHERE `description`=? LIMIT 1;",
-          { replacements: [it.description], transaction: t }
+        const existing = await queryInterface.sequelize.query(
+          `SELECT id FROM "${consultanciesTable}" WHERE description = :desc LIMIT 1;`,
+          {
+            replacements: { desc: it.description },
+            type: Sequelize.QueryTypes.SELECT,
+            transaction: t
+          }
         );
-        if (!rows.length) {
-          await queryInterface.bulkInsert('consultancies', [{
-            date: it.date, state: it.state, description: it.description,
-            fkIdUsers: it.fkIdUsers, createdAt: now, updatedAt: now
-          }], { transaction: t });
+
+        if (!existing.length) {
+          await queryInterface.bulkInsert(
+            consultanciesTable,
+            [{
+              date: it.date,
+              state: it.state,
+              description: it.description,
+              fkIdUsers: it.fkIdUsers,
+              createdAt: now,
+              updatedAt: now
+            }],
+            { transaction: t }
+          );
         }
       }
 
       await t.commit();
-    } catch (e) { await t.rollback(); throw e; }
+    } catch (e) {
+      await t.rollback();
+      throw e;
+    }
   },
+
   async down (queryInterface) {
-    await queryInterface.bulkDelete('consultancies', {
-      description: ['Asesoría inicial']
-    }, {});
+    await queryInterface.bulkDelete(
+      'Consultancies',
+      { description: ['Asesoría inicial'] },
+      {}
+    );
   }
 };

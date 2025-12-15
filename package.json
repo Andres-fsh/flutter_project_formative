@@ -8,10 +8,8 @@
   "scripts": {
     "dev": "nodemon server.js",
     "start": "node server.js",
-
     "migrate:prod": "npx sequelize-cli db:migrate --env production",
     "seed:prod": "npx sequelize-cli db:seed:all --env production",
-
     "render-postbuild": "npm run migrate:prod"
   },
   "dependencies": {
@@ -29,6 +27,7 @@
   },
   "devDependencies": {
     "dotenv": "^17.2.3",
+    "dotenv-cli": "^11.0.0",
     "nodemon": "^3.1.10"
   }
 }

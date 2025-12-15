@@ -1,6 +1,5 @@
 'use strict';
 
-/** @type {import('sequelize-cli').Migration} */
 const rolesWanted = [
   { name: 'Administrador', description: 'Usuario con acceso total al sistema' },
   { name: 'Coordinador',   description: 'Usuario que coordina proyectos y actividades' },
@@ -12,32 +11,38 @@ module.exports = {
   async up (queryInterface, Sequelize) {
     const t = await queryInterface.sequelize.transaction();
     try {
-      // Corrige el typo si existía en datos previos del dump
-      await queryInterface.sequelize.query(
-        "UPDATE `roles` SET `name`='Administrador' WHERE `name`='Aministrador';",
-        { transaction: t }
+      const table = 'Roles';
+
+      // Obtener roles existentes
+      const existing = await queryInterface.sequelize.query(
+        `SELECT id, name FROM "${table}"`,
+        { type: Sequelize.QueryTypes.SELECT, transaction: t }
       );
 
-      // Inserta o actualiza los 4 roles sin duplicar
-      for (const r of rolesWanted) {
-        const [rows] = await queryInterface.sequelize.query(
-          "SELECT `id` FROM `roles` WHERE `name` = ? LIMIT 1;",
-          { replacements: [r.name], transaction: t }
-        );
+      const existingMap = new Map(existing.map(r => [r.name, r.id]));
+      const now = new Date();
 
-        if (!rows.length) {
-          const now = new Date();
-          await queryInterface.bulkInsert('roles', [{
-            name: r.name,
-            description: r.description,
-            createdAt: now,
-            updatedAt: now
-          }], { transaction: t });
+      for (const r of rolesWanted) {
+        if (!existingMap.has(r.name)) {
+          await queryInterface.bulkInsert(
+            table,
+            [{
+              name: r.name,
+              description: r.description,
+              createdAt: now,
+              updatedAt: now
+            }],
+            { transaction: t }
+          );
         } else {
-          // opcional: mantener descripción actualizada
-          await queryInterface.sequelize.query(
-            "UPDATE `roles` SET `description` = ?, `updatedAt` = ? WHERE `name` = ?;",
-            { replacements: [r.description, new Date(), r.name], transaction: t }
+          await queryInterface.bulkUpdate(
+            table,
+            {
+              description: r.description,
+              updatedAt: now
+            },
+            { name: r.name },
+            { transaction: t }
           );
         }
       }
@@ -49,10 +54,13 @@ module.exports = {
     }
   },
 
-  async down (queryInterface, Sequelize) {
-    // Solo elimina los 4 que aseguramos (evita borrar otros ajenos)
-    await queryInterface.bulkDelete('roles', {
-      name: ['Administrador', 'Coordinador', 'Investigador', 'Aprendiz']
-    }, {});
+  async down (queryInterface) {
+    await queryInterface.bulkDelete(
+      'Roles',
+      {
+        name: ['Administrador', 'Coordinador', 'Investigador', 'Aprendiz']
+      },
+      {}
+    );
   }
 };
