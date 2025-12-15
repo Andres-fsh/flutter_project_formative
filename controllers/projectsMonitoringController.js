@@ -1,4 +1,5 @@
 const projectsMonitoringService = require('../services/projectsMonitoringService');
+const db = require('../models'); 
 
 const getAllProjectsMonitoring = async (req, res) => {
     const allProjectsMonitoring = await projectsMonitoringService.getAllProjectsMonitoring();
@@ -86,11 +87,12 @@ const getProjectsMonitoringByUserId = async (req, res) => {
         res.status(500).send({ status: "ERROR", message: error.message });
     }
 };
+
 module.exports = {
     getAllProjectsMonitoring,
     getProjectsMonitoring,
     createProjectsMonitoring,
     updateProjectsMonitoring,
     deleteProjectsMonitoring,
-    getProjectsMonitoringByUserId 
+    getProjectsMonitoringByUserId 
 };

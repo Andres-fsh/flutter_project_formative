@@ -1,9 +1,7 @@
-const db = require('../../../models');
 const { Router } = require('express');
 const projectsMonitoringController = require('../../../controllers/projectsMonitoringController');
 
 const router = Router();
-
 
 router.get('/user/:userId', projectsMonitoringController.getProjectsMonitoringByUserId);
 router.get("/", projectsMonitoringController.getAllProjectsMonitoring);
@@ -12,4 +10,4 @@ router.post('/', projectsMonitoringController.createProjectsMonitoring);
 router.put('/:projectsMonitoringId', projectsMonitoringController.updateProjectsMonitoring);
 router.delete('/:projectsMonitoringId', projectsMonitoringController.deleteProjectsMonitoring);
 
-module.exports = router;
+module.exports=router;
